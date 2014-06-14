@@ -42,7 +42,7 @@ namespace NuGetPackageFileContent
 				.Skip(arguments.Skip)
 				.Take(arguments.Take)) {
 				
-				foreach (IPackageFile file in package.GetContentFiles()) {
+				foreach (IPackageFile file in package.GetFiles()) {
 					string extension = Path.GetExtension(file.Path);
 					if (arguments.FileExtension.Equals(extension, StringComparison.OrdinalIgnoreCase)) {
 						Console.WriteLine("Package.Id: " + package.Id);
