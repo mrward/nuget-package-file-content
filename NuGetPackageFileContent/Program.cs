@@ -15,26 +15,36 @@ namespace NuGetPackageFileContent
 		{
 			try {
 				var program = new Program();
-				program.Run();
+				program.Run(args);
 			} catch (Exception ex) {
 				Console.WriteLine(ex);
 			}
 		}
 		
-		void Run()
+		void Run(string[] args)
 		{
-			string url = "http://nuget.org/api/v2/";
-			var repository = PackageRepositoryFactory.Default.CreateRepository(url);
+			var arguments = new CommandLineArguments();
+			if (!arguments.Parse(args)) {
+				arguments.PrintUsage();
+				return;
+			}
+			
+			FindPackages(arguments);
+		}
+		
+		void FindPackages(CommandLineArguments arguments)
+		{
+			var repository = PackageRepositoryFactory.Default.CreateRepository(arguments.Url);
 			foreach (IPackage package in repository
 				.Search(null, false)
 				.Where (p => p.IsLatestVersion)
 				.OrderByDescending(p => p.DownloadCount)
-				//.Skip(100)
-				.Take(100)) {
+				.Skip(arguments.Skip)
+				.Take(arguments.Take)) {
 				
 				foreach (IPackageFile file in package.GetContentFiles()) {
 					string extension = Path.GetExtension(file.Path);
-					if (".xdt" == extension.ToLower()) {
+					if (arguments.FileExtension.Equals(extension, StringComparison.OrdinalIgnoreCase)) {
 						Console.WriteLine("Package.Id: " + package.Id);
 						break;
 					}
