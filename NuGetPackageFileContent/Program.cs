@@ -26,12 +26,11 @@ namespace NuGetPackageFileContent
 			string url = "http://nuget.org/api/v2/";
 			var repository = PackageRepositoryFactory.Default.CreateRepository(url);
 			foreach (IPackage package in repository
-				.GetPackages()
-				.Where(p => p.IsAbsoluteLatestVersion)
+				.Search(null, false)
+				.Where (p => p.IsLatestVersion)
 				.OrderByDescending(p => p.DownloadCount)
 				//.Skip(100)
-				.Take(100)
-				.AsCollapsed()) {
+				.Take(100)) {
 				
 				foreach (IPackageFile file in package.GetContentFiles()) {
 					string extension = Path.GetExtension(file.Path);
